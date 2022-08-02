@@ -2,6 +2,7 @@ package restaurantstorage
 
 import (
 	"context"
+	"food-delivery-service/common"
 	restaurantmodel "food-delivery-service/module/restaurant/model"
 )
 
@@ -11,7 +12,7 @@ func (store *sqlStore) UpdateRestaurant(
 	data *restaurantmodel.RestaurantUpdate,
 ) error {
 	if err := store.db.Where(cond).Updates(data).Error; err != nil {
-		return err
+		return common.ErrDB(err)
 	}
 
 	return nil

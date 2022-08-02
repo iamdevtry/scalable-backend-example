@@ -2,6 +2,7 @@ package restaurantbiz
 
 import (
 	"context"
+	"food-delivery-service/common"
 	restaurantmodel "food-delivery-service/module/restaurant/model"
 )
 
@@ -23,7 +24,7 @@ func (biz *createRestaurantBiz) CreateRestaurant(ctx context.Context, data *rest
 	}
 
 	if err := biz.store.InsertRestaurant(ctx, data); err != nil {
-		return err
+		return common.ErrCannotCreateEntity(restaurantmodel.EntityName, err)
 	}
 
 	return nil

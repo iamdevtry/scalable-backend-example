@@ -1,7 +1,8 @@
 package main
 
 import (
-	restaurantgin "food-delivery-service/module/restaurant/transport/gin"
+	"food-delivery-service/component"
+	"food-delivery-service/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -20,18 +21,11 @@ func main() {
 	log.Println("Connected:", db)
 
 	router := gin.Default()
+	router.Use(middleware.Recover())
 
-	v1 := router.Group("/v1")
-	{
-		restaurants := v1.Group("/restaurants")
-		{
-			restaurants.POST("", restaurantgin.CreateRestaurantHandler(db))
-			restaurants.GET("", restaurantgin.ListRestaurant(db))
-			restaurants.GET("/:restaurant_id", restaurantgin.GetRestaurantHandler(db))
-			restaurants.PUT("/:restaurant_id", restaurantgin.UpdateRestaurantHandler(db))
-			restaurants.DELETE("/:restaurant_id", restaurantgin.DeleteRestaurantHandler(db))
-		}
-	}
+	appCtx := component.NewAppContext(db)
+
+	mainRoute(router, appCtx)
 
 	router.Run(":3000")
 }

@@ -1,9 +1,14 @@
 package common
 
+import "strings"
+
 type Paging struct {
 	Page  int   `json:"page" form:"page"`
 	Limit int   `json:"limit" form:"limit"`
 	Total int64 `json:"total" form:"-"`
+	// Support cursor with UID
+	FakeCursor string `json:"cursor" form:"cursor"`
+	NextCursor string `json:"next_cursor"`
 }
 
 func (p *Paging) Validate() error {
@@ -14,6 +19,8 @@ func (p *Paging) Validate() error {
 	if p.Limit <= 0 {
 		p.Limit = 10
 	}
+
+	p.FakeCursor = strings.TrimSpace(p.FakeCursor)
 
 	return nil
 }

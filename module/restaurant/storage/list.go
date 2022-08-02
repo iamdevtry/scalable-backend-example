@@ -12,7 +12,7 @@ func (store sqlStore) ListRestaurant(
 	paging *common.Paging,
 	moreKeys ...string,
 ) ([]restaurantmodel.Restaurant, error) {
-	offset := (paging.Page - 1) * paging.Limit
+	//offset := (paging.Page - 1) * paging.Limit
 
 	var result []restaurantmodel.Restaurant
 
@@ -22,13 +22,25 @@ func (store sqlStore) ListRestaurant(
 		db = db.Where("owner_id = ?", v)
 	}
 
+	if v := paging.FakeCursor; v != "" {
+		if uid, err := common.FromBase58(v); err == nil {
+			db = db.Where("id < ?", uid.GetLocalID())
+		}
+	} else {
+		db = db.Offset((paging.Page - 1) * paging.Limit)
+	}
+
 	if err := db.Table(restaurantmodel.Restaurant{}.TableName()).
 		Count(&paging.Total).
-		Offset(offset).
 		Limit(paging.Limit).
 		Order("id desc").
 		Find(&result).Error; err != nil {
-		return nil, err
+		return nil, common.ErrDB(err)
+	}
+
+	if len(result) > 0 {
+		result[len(result)-1].Mask(true)
+		paging.NextCursor = result[len(result)-1].FakeId.String()
 	}
 
 	return result, nil
