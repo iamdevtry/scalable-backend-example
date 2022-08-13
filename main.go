@@ -12,6 +12,8 @@ import (
 
 func main() {
 	dsn := os.Getenv("DB_CONN_STR")
+	secretKey := os.Getenv("SECRET_KEY")
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -23,7 +25,7 @@ func main() {
 	router := gin.Default()
 	router.Use(middleware.Recover())
 
-	appCtx := component.NewAppContext(db)
+	appCtx := component.NewAppContext(db, secretKey)
 
 	mainRoute(router, appCtx)
 
