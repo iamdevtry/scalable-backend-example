@@ -2,15 +2,17 @@ package restaurantgin
 
 import (
 	"food-delivery-service/common"
-	"food-delivery-service/component"
 	restaurantbiz "food-delivery-service/module/restaurant/biz"
 	restaurantmodel "food-delivery-service/module/restaurant/model"
 	restaurantstorage "food-delivery-service/module/restaurant/storage"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	goservice "github.com/200Lab-Education/go-sdk"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func UpdateRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
+func UpdateRestaurantHandler(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data restaurantmodel.RestaurantUpdate
 
@@ -27,7 +29,8 @@ func UpdateRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		storage := restaurantstorage.NewSQLStore(appCtx.GetMainDBConnection())
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
+		storage := restaurantstorage.NewSQLStore(db)
 		biz := restaurantbiz.NewUpdateRestaurantBiz(storage)
 
 		if err := biz.UpdateRestaurantById(c.Request.Context(), int(uid.GetLocalID()), &data); err != nil {

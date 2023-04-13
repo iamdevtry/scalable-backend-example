@@ -5,11 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"food-delivery-service/common"
-	"food-delivery-service/component"
-	"food-delivery-service/component/tokenprovider/jwt"
 	usermodel "food-delivery-service/module/user/model"
-	"github.com/gin-gonic/gin"
+	"food-delivery-service/plugin/tokenprovider"
 	"strings"
+
+	goservice "github.com/200Lab-Education/go-sdk"
+	"github.com/gin-gonic/gin"
 )
 
 type AuthenStore interface {
@@ -38,8 +39,8 @@ func extractTokenFromHeaderString(s string) (string, error) {
 // 1. Get token from header
 // 2. Validate token and parse to payload
 // 3. From the token payload, we use user_id to find from DB
-func RequiredAuth(appCtx component.AppContext, authStore AuthenStore) func(c *gin.Context) {
-	tokenProvider := jwt.NewTokenJWTProvider(appCtx.SecretKey())
+func RequiredAuth(sc goservice.ServiceContext, authStore AuthenStore) func(c *gin.Context) {
+	tokenProvider := sc.MustGet(common.JWTProvider).(tokenprovider.Provider)
 
 	return func(c *gin.Context) {
 		token, err := extractTokenFromHeaderString(c.GetHeader("Authorization"))

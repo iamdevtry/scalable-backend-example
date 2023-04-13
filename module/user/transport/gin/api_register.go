@@ -2,18 +2,20 @@ package usergin
 
 import (
 	"food-delivery-service/common"
-	"food-delivery-service/component"
 	"food-delivery-service/component/hasher"
 	userbiz "food-delivery-service/module/user/biz"
 	usermodel "food-delivery-service/module/user/model"
 	userstorage "food-delivery-service/module/user/storage"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	goservice "github.com/200Lab-Education/go-sdk"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func Register(appCtx component.AppContext) func(*gin.Context) {
+func Register(sc goservice.ServiceContext) func(*gin.Context) {
 	return func(c *gin.Context) {
-		db := appCtx.GetMainDBConnection()
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
 		var data usermodel.UserCreate
 
 		if err := c.ShouldBind(&data); err != nil {

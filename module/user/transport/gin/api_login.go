@@ -2,17 +2,19 @@ package usergin
 
 import (
 	"food-delivery-service/common"
-	"food-delivery-service/component"
 	"food-delivery-service/component/hasher"
-	"food-delivery-service/component/tokenprovider/jwt"
 	userbiz "food-delivery-service/module/user/biz"
 	usermodel "food-delivery-service/module/user/model"
 	userstorage "food-delivery-service/module/user/storage"
-	"github.com/gin-gonic/gin"
+	"food-delivery-service/plugin/tokenprovider"
 	"net/http"
+
+	goservice "github.com/200Lab-Education/go-sdk"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func Login(appCtx component.AppContext) gin.HandlerFunc {
+func Login(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var loginUserData usermodel.UserLogin
 
@@ -20,8 +22,8 @@ func Login(appCtx component.AppContext) gin.HandlerFunc {
 			panic(common.ErrInvalidRequest(err))
 		}
 
-		db := appCtx.GetMainDBConnection()
-		tokenProvider := jwt.NewTokenJWTProvider(appCtx.SecretKey())
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
+		tokenProvider := sc.MustGet(common.JWTProvider).(tokenprovider.Provider)
 
 		store := userstorage.NewSQLStore(db)
 		md5 := hasher.NewMd5Hash()

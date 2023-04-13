@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"food-delivery-service/common"
-	"food-delivery-service/component"
+
+	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 )
 
-func RequiredRoles(appCtx component.AppContext, roles ...string) func(*gin.Context) {
+func RequiredRoles(sc goservice.ServiceContext, roles ...string) func(*gin.Context) {
 	return func(c *gin.Context) {
 		u := c.MustGet(common.CurrentUser).(common.Requester)
 

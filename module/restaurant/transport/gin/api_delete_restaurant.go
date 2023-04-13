@@ -2,14 +2,16 @@ package restaurantgin
 
 import (
 	"food-delivery-service/common"
-	"food-delivery-service/component"
 	restaurantbiz "food-delivery-service/module/restaurant/biz"
 	restaurantstorage "food-delivery-service/module/restaurant/storage"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	goservice "github.com/200Lab-Education/go-sdk"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func DeleteRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
+func DeleteRestaurantHandler(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//id, err := strconv.Atoi(c.Param("restaurant_id"))
 
@@ -20,7 +22,8 @@ func DeleteRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		storage := restaurantstorage.NewSQLStore(appCtx.GetMainDBConnection())
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
+		storage := restaurantstorage.NewSQLStore(db)
 		biz := restaurantbiz.NewDeleteRestaurantBiz(storage)
 
 		if err := biz.DeleteRestaurantById(c.Request.Context(), int(uid.GetLocalID())); err != nil {

@@ -3,12 +3,14 @@ package restaurantgin
 import (
 	"context"
 	"food-delivery-service/common"
-	"food-delivery-service/component"
 	restaurantbiz "food-delivery-service/module/restaurant/biz"
 	restaurantmodel "food-delivery-service/module/restaurant/model"
 	restaurantstorage "food-delivery-service/module/restaurant/storage"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	goservice "github.com/200Lab-Education/go-sdk"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type mockCreateStore struct{}
@@ -18,7 +20,7 @@ func (mockCreateStore) InsertRestaurant(ctx context.Context, data *restaurantmod
 	return nil
 }
 
-func CreateRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
+func CreateRestaurantHandler(sc goservice.ServiceContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var data restaurantmodel.RestaurantCreate
 
@@ -27,7 +29,8 @@ func CreateRestaurantHandler(appCtx component.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		storage := restaurantstorage.NewSQLStore(appCtx.GetMainDBConnection())
+		db := sc.MustGet(common.DBMain).(*gorm.DB)
+		storage := restaurantstorage.NewSQLStore(db)
 		//storage := &mockCreateStore{}
 		biz := restaurantbiz.NewCreateRestaurantBiz(storage)
 

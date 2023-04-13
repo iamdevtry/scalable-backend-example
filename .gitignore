@@ -4,7 +4,6 @@
 *.dll
 *.so
 *.dylib
-app
 
 # Test binary, built with `go test -c`
 *.test
@@ -15,5 +14,9 @@ app
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-.vscode
-.idea
+*.env
+Dockerfile
+app
+
+deploy
+deploy.sh

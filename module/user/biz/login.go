@@ -3,8 +3,8 @@ package userbiz
 import (
 	"context"
 	"food-delivery-service/common"
-	"food-delivery-service/component/tokenprovider"
 	usermodel "food-delivery-service/module/user/model"
+	"food-delivery-service/plugin/tokenprovider"
 )
 
 type LoginStorage interface {
@@ -34,7 +34,7 @@ func NewLoginBusiness(storeUser LoginStorage, tokenProvider tokenprovider.Provid
 // 3.1. Access token and refresh token
 // 4. Return token(s)
 
-func (business *loginBusiness) Login(ctx context.Context, data *usermodel.UserLogin) (*tokenprovider.Token, error) {
+func (business *loginBusiness) Login(ctx context.Context, data *usermodel.UserLogin) (tokenprovider.Token, error) {
 	user, err := business.storeUser.FindUser(ctx, map[string]interface{}{"email": data.Email})
 
 	if err != nil {
@@ -47,9 +47,9 @@ func (business *loginBusiness) Login(ctx context.Context, data *usermodel.UserLo
 		return nil, usermodel.ErrEmailOrPasswordInvalid
 	}
 
-	payload := tokenprovider.TokenPayload{
-		UserId: user.Id,
-		Role:   user.Role.String(),
+	payload := &common.TokenPayload{
+		UId:   user.Id,
+		URole: user.Role.String(),
 	}
 
 	accessToken, err := business.tokenProvider.Generate(payload, business.expiry)
