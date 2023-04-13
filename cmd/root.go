@@ -55,7 +55,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	// TransAddPoint outenv as a sub command
 	rootCmd.AddCommand(outEnvCmd)
-	// rootCmd.AddCommand(cronjob)
+	rootCmd.AddCommand(cronjob)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
